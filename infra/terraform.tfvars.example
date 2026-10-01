@@ -1,0 +1,8 @@
+# Copie para terraform.tfvars e defina a senha (terraform.tfvars NÃO é versionado)
+#   cp terraform.tfvars.example terraform.tfvars
+
+# Senha master do RDS: 8 a 41 caracteres, somente letras e números
+db_password = "AltereEstaSenha123"
+
+# Opcional: restringir o SSH ao seu IP (ex.: ["203.0.113.10/32"])
+# ssh_allowed_cidrs = ["0.0.0.0/0"]
