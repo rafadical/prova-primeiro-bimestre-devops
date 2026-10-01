@@ -4,7 +4,9 @@
 **RA:** 6322006  
 **Ferramenta de IA utilizada:** **Claude Code** (modelo Claude Opus 5.5, da Anthropic), usado como copiloto no terminal e no editor. Não utilizei o Kiro.
 
-Durante toda a prova mantive dois arquivos de apoio fora do repositório: um `REGRAS.md`, com as exigências da prova separadas entre o que está explícito no enunciado, o que as aulas confirmam e o que era inferência; e um `HISTORICO_IA.md`, com cada interação com a IA (contexto, prompt, sugestão, minha decisão, o que foi implementado, como validei e o resultado), incluindo os erros que a IA cometeu. As respostas abaixo se baseiam nesse histórico.
+**Como a IA foi usada, de forma transparente:** o Claude Code não apenas sugeriu código — ele **criou os arquivos e executou os comandos** (Git, Docker, Terraform e AWS CLI), **inclusive os commits e o push** deste repositório, sempre depois da minha autorização para cada etapa. O meu papel foi definir as regras do trabalho, tomar as decisões que a prova não define, aprovar ou rejeitar cada etapa, conferir os resultados e executar parte das evidências (os prints do terminal e do navegador foram feitos por mim).
+
+Durante toda a prova mantive dois arquivos de apoio, que estão na pasta [`docs/`](docs/) deste repositório: o `REGRAS.md`, com as exigências da prova separadas entre o que está explícito no enunciado, o que as aulas confirmam e o que era inferência; e o `HISTORICO_IA.md`, com cada interação com a IA (contexto, prompt, sugestão, minha decisão, o que foi implementado, como validei e o resultado), incluindo os erros que a IA cometeu. As respostas abaixo se baseiam nesse histórico.
 
 ---
 
@@ -37,9 +39,9 @@ O que precisou ser corrigido, e que eu decidi registrar com honestidade:
 - Várias verificações usaram `grep`, `tail` ou `$?` de forma errada e geraram falsos positivos.
 - Em um comando, a IA esqueceu de carregar as credenciais do Lab.
 
-Ao todo foram 12 erros registrados no histórico, nenhum com impacto na entrega final.
+Ao todo foram 18 erros ou fragilidades registrados no histórico, nenhum com impacto na infraestrutura entregue. Seis deles só apareceram em uma auditoria final que pedi à IA, agindo "como o professor": uma afirmação incorreta neste relatório, uma linha de evidência digitada em vez de capturada, um trecho de evidência resumido sem aviso, a persistência do Compose apenas afirmada, trechos editados no rascunho do `entrega.md` e uma captura sem o código HTTP do POST. Todos foram corrigidos antes da entrega.
 
-Também tomei decisões que a IA não podia tomar sozinha: as regras de validação que a prova não define (campos obrigatórios, formato da data e uma lista fixa de status), usar SSE-S3 em vez de KMS no bucket, rodar a API em Docker na EC2 e como contornar a restrição do Learner Lab no S3. Comparando com fazer manualmente, a IA economizou muito tempo em código repetitivo e em detalhes de sintaxe do Terraform. Atrapalhou quando "afirmava" resultados a partir de verificações mal feitas. Por isso exigi as pré-validações e conferi cada resultado antes de aceitar.
+Também tomei decisões que a IA não podia tomar sozinha: as regras de validação que a prova não define (campos obrigatórios, formato da data e uma lista fixa de status), usar SSE-S3 em vez de KMS no bucket e como contornar a restrição do Learner Lab no S3 (tirar o bucket do state em vez de testar outra versão do provider). Já a forma de rodar a API na EC2 (Docker em vez de Node direto) foi uma recomendação da IA que **ela aplicou sem que eu tivesse escolhido explicitamente** — eu havia pedido para seguir até a etapa da AWS e não respondi a essa pergunta. Registrei isso como uma falha do processo: uma decisão de arquitetura deveria ter esperado a minha resposta. Comparando com fazer manualmente, a IA economizou muito tempo em código repetitivo e em detalhes de sintaxe do Terraform. Atrapalhou quando "afirmava" resultados a partir de verificações mal feitas. Por isso exigi as pré-validações e conferi cada resultado antes de aceitar.
 
 ---
 
@@ -78,6 +80,15 @@ Para validar que a infraestrutura estava correta e segura, não confiei só no "
 - Conferi a tabela de lock.
 - Só gerei os arquivos de evidência depois de confirmar que cada teste estava certo e vinha do serviço correto, e verifiquei que nenhuma senha ou credencial aparecia neles.
 - No final, confirmei que nenhum recurso tinha sobrado na AWS.
+
+Mesmo com essas validações, a auditoria final mostrou pontos que continuam frágeis e que eu prefiro declarar a esconder:
+- A porta 22 ficou aberta para `0.0.0.0/0` (padrão dos labs, mas não é menor privilégio de verdade).
+- A senha do RDS chega à EC2 pelo user data.
+- A conexão SSL com o RDS não valida o certificado.
+- A EC2 constrói a imagem a partir da `main` sem versão fixa.
+- A criação do bucket do state via CLI está documentada, mas não foi executada.
+
+Não alterei esses pontos depois do destroy, porque o código deixaria de corresponder ao que foi aplicado e evidenciado. Eles estão listados no README como limitações conhecidas.
 
 Se eu tivesse aceitado o código da IA sem revisar, teria tido problemas reais. A API cairia com qualquer instabilidade do banco. Uma evidência mostraria um resultado que não aconteceu. Um teste teria "passado" respondido por outro projeto. E várias verificações automáticas da IA teriam me convencido de falhas que não existiam, ou de sucessos que não estavam comprovados. Na nuvem, um erro de Security Group ou de `publicly_accessible` poderia expor o banco à internet, e uma criação de role faria o apply falhar no Lab. Ou seja: a IA é rápida, mas quem responde pelo resultado sou eu.
 
