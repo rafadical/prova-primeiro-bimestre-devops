@@ -2,7 +2,7 @@
 # Data: 2026-10-01 00:03:35 -0300
 # Ambiente: AWS Academy Learner Lab — região us-east-1 — backend s3 (technova-6322006-tfstate-a6e6b7ad) + DynamoDB (technova-6322006-terraform-locks)
 # Comandos: terraform init && terraform validate && terraform plan -out=main.tfplan
-# terraform validate: Success! The configuration is valid.
+# (anotação) terraform validate foi executado com sucesso antes deste plan; a saída real capturada está em evidencias/terraform-validate.txt
 
 
 Warning: Deprecated Parameter
