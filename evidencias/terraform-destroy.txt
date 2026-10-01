@@ -28,7 +28,8 @@ aws_dynamodb_table.locks: Destruction complete after 8s
 Apply complete! Resources: 0 added, 0 changed, 5 destroyed.
 
 ## 3) Bucket do state (fora do Terraform por causa da SCP do Learner Lab)
-6 versões do terraform.tfstate removidas (aws s3api delete-objects) e bucket removido (aws s3api delete-bucket --bucket technova-6322006-tfstate-a6e6b7ad)
+(resumo escrito — a saída destes comandos não foi gravada em arquivo; o resultado é comprovado pela verificação da seção 4)
+6 versões do terraform.tfstate removidas (aws s3api delete-objects, 0 erros) e bucket removido (aws s3api delete-bucket --bucket technova-6322006-tfstate-a6e6b7ad)
 
 ## 4) Verificação final na AWS
 bucket technova-6322006-tfstate-a6e6b7ad existe: NAO
