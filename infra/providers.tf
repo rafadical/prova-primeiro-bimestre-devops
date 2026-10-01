@@ -17,7 +17,7 @@ terraform {
   # Blocos backend não aceitam variáveis: o nome do bucket vem do
   # output s3_bucket_name de infra/backend (preenchido na Etapa 10).
   backend "s3" {
-    bucket         = "technova-6322006-tfstate-XXXXXXXX"
+    bucket         = "technova-6322006-tfstate-a6e6b7ad"
     key            = "prova/terraform.tfstate"
     region         = "us-east-1"
     encrypt        = true
