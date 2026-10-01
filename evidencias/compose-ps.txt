@@ -1,18 +1,58 @@
 # Evidência do ambiente local — Docker Compose (API + PostgreSQL)
-# Data: 2026-09-30 23:15:55 -0300
-# Comando para subir: docker compose up -d --build
+# Data: 2026-10-01 07:17:33 -0300
+# Subir o ambiente: cp .env.example .env && docker compose up -d --build
 
-## docker compose ps
+## $ docker compose ps
 NAME           IMAGE                                COMMAND                  SERVICE    CREATED          STATUS                    PORTS
-reservas-api   prova-primeiro-bimestre-devops-api   "docker-entrypoint.s…"   api        26 seconds ago   Up 19 seconds (healthy)   0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp
-reservas-db    postgres:15-alpine                   "docker-entrypoint.s…"   postgres   26 seconds ago   Up 25 seconds (healthy)   5432/tcp
+reservas-api   prova-primeiro-bimestre-devops-api   "docker-entrypoint.s…"   api        41 seconds ago   Up 34 seconds (healthy)   0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp
+reservas-db    postgres:15-alpine                   "docker-entrypoint.s…"   postgres   41 seconds ago   Up 40 seconds (healthy)   5432/tcp
 
-## Volume nomeado e rede bridge customizada do projeto
+## Volume nomeado e rede bridge customizada
 volume: prova-primeiro-bimestre-devops_pgdata (driver local)
 rede: prova-primeiro-bimestre-devops_reservas-net (driver bridge)
 
-## curl http://localhost:3000/health
-{"status":"healthy","banco":"conectado","uptime":21.023976231}
+## CRUD na API local (porta 3000, container reservas-api)
+$ curl http://localhost:3000/health
+{"status":"healthy","banco":"conectado","uptime":35.510996637}  [HTTP 200]
+$ POST /reservas
+{"id":4,"cliente":"Evidencia Local","data":"2026-12-10","status":"pendente"}  [HTTP 201]
+$ POST /reservas (inválido)
+{"erros":["cliente é obrigatório","data é obrigatória no formato YYYY-MM-DD","status é obrigatório e deve ser um de: pendente, confirmada, cancelada"]}  [HTTP 400]
+$ GET /reservas/4
+{"id":4,"cliente":"Evidencia Local","data":"2026-12-10","status":"pendente"}  [HTTP 200]
+$ GET /reservas/999999
+{"erro":"Reserva não encontrada"}  [HTTP 404]
+$ PUT /reservas/4
+{"id":4,"cliente":"Evidencia Local","data":"2026-12-11","status":"confirmada"}  [HTTP 200]
+$ GET /reservas
+[{"id":1,"cliente":"Ana Souza","data":"2026-10-20","status":"confirmada"},{"id":4,"cliente":"Evidencia Local","data":"2026-12-11","status":"confirmada"}]  [HTTP 200]
 
-## curl http://localhost:3000/reservas (dados persistidos após docker compose down + up)
-[{"id":1,"cliente":"Ana Souza","data":"2026-10-20","status":"confirmada"}]
+## Dados direto no PostgreSQL do Compose (antes do down)
+ id |     cliente     |    data    |   status   
+----+-----------------+------------+------------
+  1 | Ana Souza       | 2026-10-20 | confirmada
+  4 | Evidencia Local | 2026-12-11 | confirmada
+(2 rows)
+
+## Persistência: $ docker compose down  (sem -v)
+ Container reservas-api Removed 
+ Container reservas-db Removed 
+ Network prova-primeiro-bimestre-devops_reservas-net Removed 
+$ docker compose ps  (após down)
+NAME      IMAGE     COMMAND   SERVICE   CREATED   STATUS    PORTS
+
+## $ docker compose up -d
+ Container reservas-db Started 
+ Container reservas-db Healthy 
+ Container reservas-api Started 
+$ docker compose ps  (após up)
+NAME           IMAGE                                COMMAND                  SERVICE    CREATED          STATUS                    PORTS
+reservas-api   prova-primeiro-bimestre-devops-api   "docker-entrypoint.s…"   api        15 seconds ago   Up 8 seconds (healthy)    0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp
+reservas-db    postgres:15-alpine                   "docker-entrypoint.s…"   postgres   15 seconds ago   Up 14 seconds (healthy)   5432/tcp
+
+$ GET /reservas/4  (mesmo registro, após down + up)
+{"id":4,"cliente":"Evidencia Local","data":"2026-12-11","status":"confirmada"}  [HTTP 200]
+$ DELETE /reservas/4
+{"id":4,"cliente":"Evidencia Local","data":"2026-12-11","status":"confirmada"}  [HTTP 200]
+$ GET /reservas/4  (após DELETE)
+{"erro":"Reserva não encontrada"}  [HTTP 404]

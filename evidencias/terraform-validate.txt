@@ -1,0 +1,18 @@
+# Evidência — terraform fmt / validate (saída real, sem acesso à AWS)
+# Data: 2026-10-01 07:18:15 -0300 — Terraform v1.16.2
+
+## infra
+$ terraform fmt -check -recursive
+(sem diferenças de formatação)
+$ terraform validate
+Success! The configuration is valid.
+
+
+## infra/backend
+$ terraform fmt -check -recursive
+(sem diferenças de formatação)
+$ terraform validate
+Success! The configuration is valid.
+
+## grep por recursos IAM em infra/ (deve ser 0)
+0
