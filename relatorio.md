@@ -82,7 +82,7 @@ Para validar que a infraestrutura estava correta e segura, não confiei só no "
 - No final, confirmei que nenhum recurso tinha sobrado na AWS.
 
 Mesmo com essas validações, a auditoria final mostrou pontos que continuam frágeis e que eu prefiro declarar a esconder:
-- A porta 22 ficou aberta para `0.0.0.0/0`. É o que o professor exigiu no TF da Aula 04 e usou no código da Aula 05, mas o `aula-04/TA.md` recomenda liberar o SSH "apenas do seu IP". Em termos de menor privilégio, o ideal seria restringir ao meu IP com a variável `ssh_allowed_cidrs`, que já existe no código.
+- A porta 22 ficou aberta para `0.0.0.0/0`. É o que o professor exigiu no TF da Aula 04 e usou no código da Aula 05, mas o TA da mesma aula recomenda liberar o SSH "apenas do seu IP". Em termos de menor privilégio, o ideal seria restringir ao meu IP com a variável `ssh_allowed_cidrs`, que já existe no código.
 - A senha do RDS chega à EC2 pelo user data.
 - A conexão SSL com o RDS não valida o certificado.
 - A EC2 constrói a imagem a partir da `main` sem versão fixa.

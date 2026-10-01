@@ -169,7 +169,7 @@ cd backend && terraform destroy          # configs do bucket + DynamoDB
 
 Pontos identificados na auditoria final que **não foram alterados**, porque o código precisa continuar idêntico ao que foi aplicado e evidenciado na AWS (corrigi-los exigiria um novo `apply` e novas evidências):
 
-- **SSH (22) aberto para `0.0.0.0/0`** — segue o que o professor exigiu no TF da Aula 04 ("Porta `22` (TCP) — SSH — de `0.0.0.0/0`", `aula-04/TF.md`) e o que usa no código da Aula 05 (`aula-05/aula-05-rds/ec2.tf`). Já o `aula-04/TA.md` recomenda liberar o SSH "apenas do seu IP". O projeto já permite isso pela variável `ssh_allowed_cidrs` (ex.: `["SEU_IP/32"]`). Não alterei depois da execução para não divergir das evidências.
+- **SSH (22) aberto para `0.0.0.0/0`** — segue o que o professor exigiu no TF da Aula 04 ("Porta `22` (TCP) — SSH — de `0.0.0.0/0`", `aula-04/TF.md`) e o que usa no código da Aula 05 (`aula-05/aula-05-rds/ec2.tf`). O laboratório da Aula 04 e o TA recomendam, em produção, restringir ao IP do administrador ("apenas do seu IP", `aula-04/TA.md`). O projeto já permite isso pela variável `ssh_allowed_cidrs` (ex.: `["SEU_IP/32"]`). Não alterei depois da execução para não divergir das evidências.
 - **Senha do RDS no user data** — o `user_data.sh` grava as variáveis de conexão em `/opt/reservas/api.env` (`chmod 600`), mas o user data fica visível nos metadados da instância. Em produção: AWS Secrets Manager/SSM Parameter Store.
 - **SSL sem validação de certificado** — a API conecta ao RDS com SSL (`DB_SSL=true`) e `rejectUnauthorized: false`; em produção, validar com o bundle de CA da AWS.
 - **EC2 constrói a imagem a partir da branch `main`** no momento do boot (sem versão fixa); em produção, usar uma imagem publicada em registry com tag.
