@@ -1,0 +1,104 @@
+# Evidência — API de Reservas na AWS (EC2 + RDS) — AWS Academy Learner Lab, us-east-1
+# Data: 2026-10-01 00:16:40 -0300
+
+## Identidade (Learner Lab)
+arn:aws:sts::211973601530:assumed-role/voclabs/user5436142=Rafael_Nogueira_maruca_-_6322006
+
+## terraform output
+api_url = "http://3.84.136.24:3000"
+ec2_public_dns = "ec2-3-84-136-24.compute-1.amazonaws.com"
+ec2_public_ip = "3.84.136.24"
+ec2_security_group_id = "sg-01684f963abcb7052"
+private_subnet_ids = [
+  "subnet-0b6becc4ece9ae814",
+  "subnet-04dfc18d81cf80511",
+]
+public_subnet_ids = [
+  "subnet-055a22a301307a941",
+  "subnet-000285b71e73d8d11",
+]
+rds_address = "technova-dev-db.cjgxolbvplbe.us-east-1.rds.amazonaws.com"
+rds_endpoint = "technova-dev-db.cjgxolbvplbe.us-east-1.rds.amazonaws.com:5432"
+rds_security_group_id = "sg-042bd67f7a8153292"
+ssh_command = "ssh -i ~/.ssh/prova-reservas-key ec2-user@3.84.136.24"
+vpc_id = "vpc-07faf16c1248df259"
+
+Warning: Deprecated Parameter
+
+The parameter "dynamodb_table" is deprecated. Use parameter "use_lockfile"
+instead.
+
+## curl http://3.84.136.24:3000/health
+{"status":"healthy","banco":"conectado","uptime":151.585414086}
+
+## CRUD na API da EC2 (dados gravados no RDS)
+$ POST /reservas
+{"id":3,"cliente":"Evidencia AWS","data":"2026-11-10","status":"pendente"}  [HTTP 201]
+$ POST /reservas (inválido)
+{"erros":["cliente é obrigatório","data é obrigatória no formato YYYY-MM-DD","status é obrigatório e deve ser um de: pendente, confirmada, cancelada"]}  [HTTP 400]
+$ GET /reservas
+[{"id":1,"cliente":"Cliente Nuvem","data":"2026-10-25","status":"confirmada"},{"id":3,"cliente":"Evidencia AWS","data":"2026-11-10","status":"pendente"}]  [HTTP 200]
+$ GET /reservas/3
+{"id":3,"cliente":"Evidencia AWS","data":"2026-11-10","status":"pendente"}  [HTTP 200]
+$ GET /reservas/999
+{"erro":"Reserva não encontrada"}  [HTTP 404]
+$ PUT /reservas/3
+{"id":3,"cliente":"Evidencia AWS","data":"2026-11-12","status":"confirmada"}  [HTTP 200]
+$ DELETE /reservas/3
+{"id":3,"cliente":"Evidencia AWS","data":"2026-11-12","status":"confirmada"}  [HTTP 200]
+$ GET /reservas
+[{"id":1,"cliente":"Cliente Nuvem","data":"2026-10-25","status":"confirmada"}]  [HTTP 200]
+
+## Na EC2: container da API e consulta direta ao RDS (psql com sslmode=require)
+reservas-api api-reservas:1.0 Up 2 minutes 0.0.0.0:3000->3000/tcp, :::3000->3000/tcp
+ ip_servidor_rds | current_database |                                              version                                              
+-----------------+------------------+---------------------------------------------------------------------------------------------------
+ 10.0.3.250      | reservas         | PostgreSQL 15.17 on x86_64-pc-linux-gnu, compiled by x86_64-pc-linux-gnu-gcc (GCC) 12.4.0, 64-bit
+(1 row)
+
+ id |    cliente    |    data    |   status   
+----+---------------+------------+------------
+  1 | Cliente Nuvem | 2026-10-25 | confirmada
+(1 row)
+
+
+## RDS (aws rds describe-db-instances)
+-------------------------------------------------
+|              DescribeDBInstances              |
++--------------+--------------------------------+
+|  Classe      |  db.t3.micro                   |
+|  Encriptado  |  True                          |
+|  Engine      |  postgres                      |
+|  MultiAZ     |  False                         |
+|  Publico     |  False                         |
+|  Status      |  available                     |
+|  SubnetGroup |  technova-dev-db-subnet-group  |
+|  Versao      |  15.17                         |
++--------------+--------------------------------+
+Subnets do DB subnet group (privadas):
+subnet-04dfc18d81cf80511	us-east-1b
+subnet-0b6becc4ece9ae814	us-east-1a
+
+## Security Group do RDS — entrada 5432 somente do SG da EC2 (sg-01684f963abcb7052)
+--------------------------------------------
+|          DescribeSecurityGroups          |
++-------+--------+-------------------------+
+| CIDRs | Porta  |        SG_origem        |
++-------+--------+-------------------------+
+|  0    |  5432  |  sg-01684f963abcb7052   |
++-------+--------+-------------------------+
+
+## EC2 (LabInstanceProfile, sem IAM criado)
+-----------------------------------------------------------------------------
+|                             DescribeInstances                             |
++--------+------------------------------------------------------------------+
+|  Estado|  running                                                         |
+|  Perfil|  arn:aws:iam::211973601530:instance-profile/LabInstanceProfile   |
+|  Subnet|  subnet-055a22a301307a941                                        |
+|  Tipo  |  t2.micro                                                        |
++--------+------------------------------------------------------------------+
+
+## Remote state no S3 (versionado e encriptado) + lock DynamoDB
+2026-10-01 00:13:03      38916 terraform.tfstate
+versionamento: Enabled | encriptação: AES256
+technova-6322006-tfstate-a6e6b7ad/prova/terraform.tfstate-md5
