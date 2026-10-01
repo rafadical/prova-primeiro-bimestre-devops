@@ -1,11 +1,11 @@
 output "s3_bucket_name" {
   description = "Nome do bucket S3 do state (usar no backend \"s3\" de infra/providers.tf)"
-  value       = aws_s3_bucket.state.id
+  value       = local.bucket_name
 }
 
 output "s3_bucket_arn" {
   description = "ARN do bucket S3 do state"
-  value       = aws_s3_bucket.state.arn
+  value       = "arn:aws:s3:::${local.bucket_name}"
 }
 
 output "dynamodb_table_name" {
