@@ -1,0 +1,67 @@
+# ==================================================
+# Ambiente local da API de Reservas (API + PostgreSQL)
+# Uso: cp .env.example .env  (e defina a senha)
+#      docker compose up -d --build
+# ==================================================
+
+services:
+  # ---------- API de Reservas (Node.js/Express) ----------
+  api:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: reservas-api
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      DB_HOST: postgres          # nome do serviço = hostname na rede interna
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB:?Defina POSTGRES_DB no arquivo .env}
+      DB_USER: ${POSTGRES_USER:?Defina POSTGRES_USER no arquivo .env}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no arquivo .env}
+      DB_SSL: "false"            # SSL só é necessário no RDS
+    depends_on:
+      postgres:
+        condition: service_healthy   # só sobe quando o banco estiver pronto
+    healthcheck:
+      # Usa a rota /health da API (a imagem alpine tem wget, não curl)
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - reservas-net
+    restart: unless-stopped
+
+  # ---------- Banco de dados PostgreSQL ----------
+  postgres:
+    image: postgres:15-alpine
+    container_name: reservas-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?Defina POSTGRES_DB no arquivo .env}
+      POSTGRES_USER: ${POSTGRES_USER:?Defina POSTGRES_USER no arquivo .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no arquivo .env}
+    # Porta do banco não é publicada no host: apenas a API acessa pela rede interna
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # $$ faz o Compose passar a variável para o shell do container
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - reservas-net
+    restart: unless-stopped
+
+# ---------- Rede bridge customizada ----------
+networks:
+  reservas-net:
+    driver: bridge
+
+# ---------- Volume nomeado (persistência do banco) ----------
+volumes:
+  pgdata:
