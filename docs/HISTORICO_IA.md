@@ -851,6 +851,43 @@
 - **Como foi validado:** `gh api` (branch padrão `main`, visibilidade public, conteúdo e tamanhos).
 - **Resultado:** OK
 
+## Interação 37 — Relatório aprovado; plano para corrigir os pontos que dependem da AWS
+- **Data:** 2026-10-01
+- **Contexto:** o aluno revisou o relatório e pediu o plano para corrigir os pontos de AWS, deixando o PR para depois.
+- **Prompt enviado:** "1 revisei o relatorio e ele esta bom e correto, podemos manter ele / 2 o que precisa para corrigir os pontos da AWS / 4 deixar para abrir o PR apenas depois, precisa focar em resolver tudo para agora"
+- **Resumo da resposta da IA:** plano em Fase A (offline) e Fase B (Lab).
+  1. SSH restrito ao IP público do aluno `/32` (variável obrigatória).
+  2. Senha via SSM Parameter Store SecureString lida pela EC2 com a `LabRole`. **[INFERÊNCIA]** Permissão a confirmar no Lab.
+  3. CA bundle do RDS com `rejectUnauthorized: true`.
+  4. `repo_ref` com SHA fixo.
+  5. Teste real da recriação do backend via CLI.
+  - Avisou que os trechos de limitações do README e do relatório precisarão ser atualizados e reaprovados.
+- **Sugestões pendentes de decisão:**
+  - (A) consultar o IP em `checkip.amazonaws.com` e mostrar ou mascarar o IP nas evidências;
+  - (B) SSM; (C) CA bundle; (D) `repo_ref`;
+  - (E) substituir as evidências antigas ou movê-las para `evidencias/execucao-1/` (recomendado).
+- **Decisão do aluno:** relatório **ACEITO**; PR **adiado**; correções A–E: PENDENTE.
+- **O que realmente foi implementado:** nada.
+- **Arquivos alterados:** nenhum.
+- **Como foi validado:** não se aplica.
+- **Resultado:** PENDENTE
+
+## Interação 38 — Decisão: finalizar sem novo Lab (opção 1) e limpeza final
+- **Data:** 2026-10-01
+- **Contexto:** o aluno perguntou se é preciso um novo Lab. A IA explicou:
+  - **Opção 1:** finalizar como está; todos os requisitos explícitos estão atendidos e os 4 pontos ficam como limitações declaradas. Risco moderado a baixo só no SSH (o professor usa `0.0.0.0/0` nos labs).
+  - **Opção 2:** novo Lab (~1h).
+  - Não há meio-termo: alterar o código sem aplicar deixaria código e evidências divergentes e sem `plan`.
+- **Prompts enviados:** "precisa ter a nova sessão do LAB, ou podemos finalizar tudo sem iniciar um novo lab" / "vamos de opção 1, finalizar sem novo lab"
+- **Decisão do aluno:** **opção 1 ACEITA** (sem novo Lab). As correções A–E da Interação 37 ficam **REJEITADAS/não executadas** por decisão do aluno; as limitações continuam documentadas no README e no relatório.
+- **O que realmente foi implementado (limpeza local, nada versionado):**
+  - `aws-creds.sh` voltou aos placeholders (credenciais removidas do disco).
+  - `infra/terraform.tfvars` apagado (senha de um RDS já destruído; o `.example` continua versionado).
+  - O `.env` e o Compose local foram mantidos.
+- **Arquivos alterados:** `aws-creds.sh`, `infra/terraform.tfvars` (ambos locais e ignorados pelo Git); cópia `docs/HISTORICO_IA.md` sincronizada.
+- **Como foi validado:** `git ls-files` (nenhum dos dois versionado); `grep` do `aws-creds.sh` mostra só os placeholders; `git status` limpo.
+- **Resultado:** OK — projeto finalizado. Pendente apenas: o PR, quando o aluno decidir. Recomendado também encerrar a sessão do Learner Lab (End Lab).
+
 ---
 
 ## Erros cometidos pela IA (consolidado)
