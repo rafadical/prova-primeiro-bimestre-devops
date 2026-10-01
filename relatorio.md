@@ -12,15 +12,31 @@ Durante toda a prova mantive dois arquivos de apoio, que estão na pasta [`docs/
 
 ## Questão 1 — A Jornada Completa (Aulas 01 a 07)
 
-Antes de escrever qualquer código, pedi à IA para ler o enunciado da prova e todo o material das aulas 01 a 07 e dividir a prova em 15 etapas pequenas, em ordem de execução. Essa divisão segue a própria dica do professor ("comece pelo Git e pela aplicação; containerize; suba local com Compose; só então vá para a AWS") e o conceito de decomposição da Aula 07: cada etapa tinha objetivo, arquivos, se precisava ou não de AWS e como validar. Só avançávamos para a etapa seguinte depois de validar a atual.
+Antes de escrever qualquer código, pedi à IA para ler o enunciado da prova e todo o material das aulas 01 a 07 e dividir a prova em 15 etapas pequenas, em ordem de execução.
 
-A **Aula 01** apareceu logo no começo: criei o repositório `prova-primeiro-bimestre-devops` com `git init -b main`, `.gitignore` e README, e usei Conventional Commits e feature branches durante todo o projeto (`feature/api-reservas`, `feature/infra-terraform`, `feature/documentacao`), integradas com `git merge --no-ff` para o merge ficar visível no histórico. Também da Aula 01 veio o Dockerfile: mantive o padrão `node:20-alpine` com o `package*.json` copiado antes do código, e evoluí para multi-stage com usuário não-root, como a prova recomenda.
+Essa divisão segue a própria dica do professor ("comece pelo Git e pela aplicação; containerize; suba local com Compose; só então vá para a AWS") e o conceito de decomposição da Aula 07: cada etapa tinha objetivo, arquivos, se precisava ou não de AWS e como validar.
+
+Só avançávamos para a etapa seguinte depois de validar a atual.
+
+A **Aula 01** apareceu logo no começo: criei o repositório `prova-primeiro-bimestre-devops` com `git init -b main`, `.gitignore` e README, e usei Conventional Commits e feature branches durante todo o projeto (`feature/api-reservas`, `feature/infra-terraform`, `feature/documentacao`), integradas com `git merge --no-ff` para o merge ficar visível no histórico.
+
+Também da Aula 01 veio o Dockerfile: mantive o padrão `node:20-alpine` com o `package*.json` copiado antes do código, e evoluí para multi-stage com usuário não-root, como a prova recomenda.
 
 A **Aula 02** apareceu no `docker-compose.yml` (API + PostgreSQL 15, volume nomeado, rede bridge customizada, healthcheck com `pg_isready`, `depends_on` com `service_healthy`, `.env.example` sem senha real) e no uso da IA como copiloto com checklist de validação (`docker compose config` antes de subir).
 
-As **Aulas 03 a 06** formaram a infraestrutura. Da Aula 03 vieram o fluxo `init → validate → plan → apply → destroy`, os providers e as tags; o IAM da Aula 03 serviu como conceito, porque no Learner Lab não é permitido criar roles. Da Aula 04 vieram a VPC com subnets públicas e privadas, o Internet Gateway, os Security Groups, a AMI via data source, o key pair e o user data. Da Aula 05 vieram o RDS nas subnets privadas (DB Subnet Group em 2 AZs) e o remote state com S3 e DynamoDB. Da Aula 06 vieram os módulos `vpc`, `security-group`, `ec2` e `rds`, o `for_each` nas subnets e a composição (o output de um módulo alimentando o input do outro).
+As **Aulas 03 a 06** formaram a infraestrutura. Da Aula 03 vieram o fluxo `init → validate → plan → apply → destroy`, os providers e as tags; o IAM da Aula 03 serviu como conceito, porque no Learner Lab não é permitido criar roles.
 
-A ordem foi escolhida por dependência: primeiro a API funcionando localmente contra um PostgreSQL de verdade, depois a imagem, depois o Compose, e só então a nuvem, porque a EC2 clona o repositório público e constrói a mesma imagem já testada. Na AWS, o backend veio antes do projeto principal (o bucket precisa existir antes do `backend "s3"`), e o `terraform destroy` só foi executado depois de capturar todas as evidências. A **Aula 07** atravessou o projeto inteiro: decompor, guiar a IA com contexto e regras, e validar cada parte antes de seguir.
+Da Aula 04 vieram a VPC com subnets públicas e privadas, o Internet Gateway, os Security Groups, a AMI via data source, o key pair e o user data.
+
+Da Aula 05 vieram o RDS nas subnets privadas (DB Subnet Group em 2 AZs) e o remote state com S3 e DynamoDB.
+
+Da Aula 06 vieram os módulos `vpc`, `security-group`, `ec2` e `rds`, o `for_each` nas subnets e a composição (o output de um módulo alimentando o input do outro).
+
+A ordem foi escolhida por dependência: primeiro a API funcionando localmente contra um PostgreSQL de verdade, depois a imagem, depois o Compose, e só então a nuvem, porque a EC2 clona o repositório público e constrói a mesma imagem já testada.
+
+Na AWS, o backend veio antes do projeto principal (o bucket precisa existir antes do `backend "s3"`), e o `terraform destroy` só foi executado depois de capturar todas as evidências.
+
+A **Aula 07** atravessou o projeto inteiro: decompor, guiar a IA com contexto e regras, e validar cada parte antes de seguir.
 
 ---
 
@@ -47,11 +63,21 @@ Também tomei decisões que a IA não podia tomar sozinha: as regras de validaç
 
 ## Questão 3 — Infraestrutura, Segurança e o Learner Lab
 
-Provisionei uma VPC `10.0.0.0/16` em `us-east-1` com quatro subnets em duas AZs: duas públicas (10.0.1.0/24 e 10.0.2.0/24), associadas a uma route table com rota `0.0.0.0/0` para o Internet Gateway, e duas privadas (10.0.3.0/24 e 10.0.4.0/24), sem rota para a internet. A EC2 t2.micro fica na subnet pública, roda a API em um container Docker na porta 3000 e tem um Security Group que libera apenas as portas 22 e 3000. O RDS PostgreSQL 15 db.t3.micro fica nas subnets privadas, através de um DB Subnet Group que exige duas AZs. Ele tem `publicly_accessible = false`, `storage_encrypted = true`, e um Security Group que aceita a porta 5432 **somente a partir do Security Group da EC2**, sem nenhum CIDR. O diagrama está no `README.md`.
+Provisionei uma VPC `10.0.0.0/16` em `us-east-1` com quatro subnets em duas AZs: duas públicas (10.0.1.0/24 e 10.0.2.0/24), associadas a uma route table com rota `0.0.0.0/0` para o Internet Gateway, e duas privadas (10.0.3.0/24 e 10.0.4.0/24), sem rota para a internet.
 
-O RDS fica na subnet privada porque o banco não precisa e não deve ser alcançável pela internet: só a API conversa com ele. A EC2 fica na pública porque precisa receber as requisições dos clientes. Na prática, confirmei pela EC2 com `psql` que o servidor do banco tinha o IP 10.0.3.250, dentro da subnet privada, e que os dados gravados pela API estavam lá. Também confirmei pela AWS CLI que o RDS estava com "público = False" e "encriptado = True", e que a regra do SG tinha como origem o ID do SG da EC2.
+A EC2 t2.micro fica na subnet pública, roda a API em um container Docker na porta 3000 e tem um Security Group que libera apenas as portas 22 e 3000.
 
-Em vez de criar IAM próprio, que o Lab bloqueia, a instância usa o `LabInstanceProfile`, que já contém a `LabRole`. No Terraform isso é só `iam_instance_profile = "LabInstanceProfile"` no módulo `ec2`, e o plan mostrou zero recursos `aws_iam_*`. A IA havia sido orientada desde o início com essa restrição, como o professor recomenda.
+O RDS PostgreSQL 15 db.t3.micro fica nas subnets privadas, através de um DB Subnet Group que exige duas AZs. Ele tem `publicly_accessible = false`, `storage_encrypted = true`, e um Security Group que aceita a porta 5432 **somente a partir do Security Group da EC2**, sem nenhum CIDR. O diagrama está no `README.md`.
+
+O RDS fica na subnet privada porque o banco não precisa e não deve ser alcançável pela internet: só a API conversa com ele. A EC2 fica na pública porque precisa receber as requisições dos clientes.
+
+Na prática, confirmei pela EC2 com `psql` que o servidor do banco tinha o IP 10.0.3.250, dentro da subnet privada, e que os dados gravados pela API estavam lá.
+
+Também confirmei pela AWS CLI que o RDS estava com "público = False" e "encriptado = True", e que a regra do SG tinha como origem o ID do SG da EC2.
+
+Em vez de criar IAM próprio, que o Lab bloqueia, a instância usa o `LabInstanceProfile`, que já contém a `LabRole`.
+
+No Terraform isso é só `iam_instance_profile = "LabInstanceProfile"` no módulo `ec2`, e o plan mostrou zero recursos `aws_iam_*`. A IA havia sido orientada desde o início com essa restrição, como o professor recomenda.
 
 O Learner Lab exigiu vários ajustes em relação ao que foi ensinado:
 - As credenciais são temporárias e incluem um Session Token. Usei o `aws-creds.sh` com `export` e `source`, como nas aulas, e esse arquivo fica fora do Git. Na primeira vez colei o bloco no formato INI que o Lab mostra, e ele não funcionaria com `source`; a IA verificou o formato sem exibir os valores e eu corrigi.
