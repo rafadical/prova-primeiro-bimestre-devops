@@ -22,7 +22,12 @@
 # Remoção (após o terraform destroy do projeto principal infra/):
 #   B=$(terraform output -raw s3_bucket_name)
 #   terraform destroy
-#   aws s3 rb "s3://$B" --force   # (versões do state: ver Etapa 12)
+#   # bucket versionado: apagar todas as versões antes de remover o bucket
+#   aws s3api list-object-versions --bucket "$B" \
+#     --query '{Objects: Versions[].{Key:Key,VersionId:VersionId}, Quiet: `true`}' \
+#     --output json > del.json
+#   aws s3api delete-objects --bucket "$B" --delete file://del.json
+#   aws s3api delete-bucket --bucket "$B"
 # ==================================================
 
 # Sufixo aleatório: nomes de bucket S3 são globalmente únicos
