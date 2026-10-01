@@ -1,0 +1,41 @@
+# Evidência — terraform destroy (após captura das evidências)
+# Data: 2026-10-01 01:05:23 -0300 — AWS Academy Learner Lab, us-east-1
+
+## 1) Infraestrutura principal (infra/): terraform plan -destroy -out=destroy.tfplan && terraform apply destroy.tfplan
+module.vpc.aws_route_table_association.public["public-1"]: Destruction complete after 1s
+module.vpc.aws_route_table_association.public["public-2"]: Destruction complete after 1s
+module.vpc.aws_route_table.public: Destruction complete after 1s
+module.vpc.aws_internet_gateway.main: Destruction complete after 30s
+module.ec2.aws_instance.this: Destruction complete after 33s
+aws_key_pair.api: Destruction complete after 0s
+module.rds.aws_db_instance.this: Destruction complete after 1m53s
+module.rds.aws_db_subnet_group.this: Destruction complete after 1s
+module.vpc.aws_subnet.this["public-1"]: Destruction complete after 1s
+module.vpc.aws_subnet.this["public-2"]: Destruction complete after 1s
+module.vpc.aws_subnet.this["private-1"]: Destruction complete after 1s
+module.sg_rds.aws_security_group.this: Destruction complete after 2s
+module.vpc.aws_subnet.this["private-2"]: Destruction complete after 1s
+module.sg_ec2.aws_security_group.this: Destruction complete after 1s
+module.vpc.aws_vpc.main: Destruction complete after 1s
+Apply complete! Resources: 0 added, 0 changed, 15 destroyed.
+
+## 2) Backend (infra/backend/): terraform plan -destroy -out=destroy-backend.tfplan && terraform apply destroy-backend.tfplan
+aws_s3_bucket_server_side_encryption_configuration.state: Destruction complete after 1s
+aws_s3_bucket_versioning.state: Destruction complete after 1s
+aws_s3_bucket_public_access_block.state: Destruction complete after 2s
+random_id.bucket_suffix: Destruction complete after 0s
+aws_dynamodb_table.locks: Destruction complete after 8s
+Apply complete! Resources: 0 added, 0 changed, 5 destroyed.
+
+## 3) Bucket do state (fora do Terraform por causa da SCP do Learner Lab)
+6 versões do terraform.tfstate removidas (aws s3api delete-objects) e bucket removido (aws s3api delete-bucket --bucket technova-6322006-tfstate-a6e6b7ad)
+
+## 4) Verificação final na AWS
+bucket technova-6322006-tfstate-a6e6b7ad existe: NAO
+tabela technova-6322006-terraform-locks existe: NAO
+VPCs (tag Owner=6322006): 0
+EC2 ativas (tag Owner=6322006): 0
+RDS instances: 0
+Security Groups technova-dev-*: 0
+terraform state list (infra/): vazio — verificado logo após o destroy da infra principal, antes de remover o bucket (o state remoto deixou de existir junto com o bucket)
+terraform state list (infra/backend/): 0 recursos
