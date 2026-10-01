@@ -1,0 +1,32 @@
+# ===== Exigidos pela prova =====
+# Dependências Node
+node_modules/
+
+# Variáveis de ambiente (contêm senhas)
+.env
+
+# Terraform: plugins/módulos baixados e arquivos de state (inclui infra/ e infra/backend/)
+.terraform/
+*.tfstate
+*.tfstate.*
+
+# Chaves privadas
+*.pem
+
+# ===== Padrão das aulas (aulas 01, 03, 04, 05) =====
+# Valores de variáveis Terraform (contêm a senha do RDS) — versionar apenas *.tfvars.example
+*.tfvars
+.terraform.lock.hcl
+*.tfplan
+tfplan
+
+# Credenciais temporárias do AWS Academy Learner Lab
+aws-creds.sh
+
+# Chaves SSH
+*.key
+
+# Logs e sistema operacional
+*.log
+.DS_Store
+Thumbs.db
