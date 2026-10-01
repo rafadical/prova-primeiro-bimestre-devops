@@ -970,6 +970,33 @@
 - **Como foi validado:** `git diff`; `grep` sem "18 erros" no relatório; `diff` entre os originais e o `docs/`; `git status` após o push.
 - **Resultado:** OK. Código, evidências e AWS não foram tocados.
 
+## Interação 44 — Learner Lab encerrado pelo limite de tempo
+- **Data:** 2026-10-01
+- **Contexto:** o aluno informou que a sessão do Lab foi encerrada automaticamente.
+- **Prompt enviado:** "lab ja esta encerrado devido ao tempo de 4 horas"
+- **Resumo da resposta da IA:** nenhuma ação na AWS é necessária (destroy confirmado nas varreduras anteriores). Recomendou fazer uma única sincronização do `docs/HISTORICO_IA.md` antes do PR.
+- **Decisão do aluno:** pediu para deixar tudo pronto para o PR (Interação 45).
+- **O que realmente foi implementado:** nada.
+- **Arquivos alterados:** nenhum.
+- **Como foi validado:** não se aplica.
+- **Resultado:** OK
+
+## Interação 45 — Preparação do PR (sem abrir)
+- **Data:** 2026-10-01
+- **Contexto:** o aluno pediu para deixar tudo pronto para fazer o PR.
+- **Prompt enviado:** "deixe tudo pronto para fazer o PR"
+- **Resumo da resposta da IA:**
+  - Pré-validação: fork com ahead 0 e behind 290; nenhum PR da prova; pasta `entregas/provaPrimeiroBi/` só com `.gitkeep`. O workflow dispara só com `pull_request_target` no repositório da disciplina; o push de branch no fork não aciona o bot. O bot lê o link do `entrega.md` do PR.
+  - O clone local `devops_20262` é do repositório do professor; por isso o fork foi clonado em `fork-devops_20262/`.
+- **Decisão do aluno:** ACEITA (pedido do aluno). **Abertura do PR: PENDENTE** de confirmação explícita, no dia da prova.
+- **O que realmente foi implementado:**
+  - Fork sincronizado com `gh repo sync` (ahead 0, behind 0).
+  - Branch `prova-primeiro-bimestre-6322006` no fork, com 1 commit que adiciona apenas `entregas/provaPrimeiroBi/6322006/entrega.md` (cópia byte a byte do rascunho, data 01/10/2026), com push.
+  - Comando do PR preparado, **não executado**.
+- **Arquivos alterados:** `entregas/provaPrimeiroBi/6322006/entrega.md` (no fork); `HISTORICO_IA.md` e `docs/HISTORICO_IA.md` (sincronização final antes do PR).
+- **Como foi validado:** `cmp` com o rascunho; `git diff --name-only upstream/main...HEAD` = só o `entrega.md`; compare da API (ahead 1, behind 0, 1 arquivo); `gh pr list` sem PR aberto.
+- **Resultado:** OK. Esta é a última alteração no repositório do projeto antes do PR; a interação da abertura do PR ficará só no histórico local.
+
 ---
 
 ## Erros cometidos pela IA (consolidado)
@@ -998,6 +1025,7 @@
 | 20 | 40–42 | Interações 40 e 41 não foram registradas no histórico na hora (os blocos REGISTRO ficaram só no chat) | 2ª auditoria (Interação 42) | Registradas retroativamente na Interação 43 |
 | 21 | 43 | Ao aplicar o texto do SSH, a IA "corrigiu" a frase aprovada ("O laboratório da Aula 04 e o TA recomendam...") achando que só o TA dizia isso, sem conferir o laboratório; o commit `b7b9c46` saiu com essa versão | Conferência posterior: `aula-04/laboratorio-parte1.md:458` diz "Em produção, restringir ao seu IP!" | Texto original restaurado em novo commit antes do merge |
 | 22 | 43 | `git merge -F -` (mensagem pela entrada padrão) não é suportado pelo `git merge`; o merge falhou com "could not read file '-'" | Saída do comando e `git log` sem o merge | Merge refeito com `-m`; nenhum arquivo afetado |
+| 23 | 45 | Conferência `git diff upstream/main...HEAD` rodada sem `git fetch upstream` no clone novo; falhou e interrompeu a cadeia antes do push | Erro "unknown revision" | `git fetch upstream`, conferência refeita (só o `entrega.md`) e push depois |
 
 ## Sugestões rejeitadas (consolidado)
 
