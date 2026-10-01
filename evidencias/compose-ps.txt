@@ -1,0 +1,18 @@
+# Evidência do ambiente local — Docker Compose (API + PostgreSQL)
+# Data: 2026-09-30 23:15:55 -0300
+# Comando para subir: docker compose up -d --build
+
+## docker compose ps
+NAME           IMAGE                                COMMAND                  SERVICE    CREATED          STATUS                    PORTS
+reservas-api   prova-primeiro-bimestre-devops-api   "docker-entrypoint.s…"   api        26 seconds ago   Up 19 seconds (healthy)   0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp
+reservas-db    postgres:15-alpine                   "docker-entrypoint.s…"   postgres   26 seconds ago   Up 25 seconds (healthy)   5432/tcp
+
+## Volume nomeado e rede bridge customizada do projeto
+volume: prova-primeiro-bimestre-devops_pgdata (driver local)
+rede: prova-primeiro-bimestre-devops_reservas-net (driver bridge)
+
+## curl http://localhost:3000/health
+{"status":"healthy","banco":"conectado","uptime":21.023976231}
+
+## curl http://localhost:3000/reservas (dados persistidos após docker compose down + up)
+[{"id":1,"cliente":"Ana Souza","data":"2026-10-20","status":"confirmada"}]
