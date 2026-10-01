@@ -997,6 +997,7 @@
 | 19 | 39 | Comparação do checklist com `${l#- [ ] }` (glob do bash) gerou falso "DIFERENTE" em todos os itens | Saída ainda mostrava o prefixo `- [ ]` | Refeita com `sed` + `diff`: IDÊNTICOS |
 | 20 | 40–42 | Interações 40 e 41 não foram registradas no histórico na hora (os blocos REGISTRO ficaram só no chat) | 2ª auditoria (Interação 42) | Registradas retroativamente na Interação 43 |
 | 21 | 43 | Ao aplicar o texto do SSH, a IA "corrigiu" a frase aprovada ("O laboratório da Aula 04 e o TA recomendam...") achando que só o TA dizia isso, sem conferir o laboratório; o commit `b7b9c46` saiu com essa versão | Conferência posterior: `aula-04/laboratorio-parte1.md:458` diz "Em produção, restringir ao seu IP!" | Texto original restaurado em novo commit antes do merge |
+| 22 | 43 | `git merge -F -` (mensagem pela entrada padrão) não é suportado pelo `git merge`; o merge falhou com "could not read file '-'" | Saída do comando e `git log` sem o merge | Merge refeito com `-m`; nenhum arquivo afetado |
 
 ## Sugestões rejeitadas (consolidado)
 
