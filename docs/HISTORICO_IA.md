@@ -1022,6 +1022,24 @@
 - **Como foi validado:** `diff` da sequência de palavras antes e depois = idênticas; `file` = UTF-8 com CRLF; contagem de linhas por questão com `awk`.
 - **Resultado:** OK. O `entrega.md` não muda (o checklist já marcava o relatório completo).
 
+## Interação 48 — Comparação com os PRs dos colegas e evidência de Git
+- **Data:** 2026-10-01 (dia da entrega)
+- **Contexto:** depois de três verificações e de uma pergunta sobre o SSH (resposta: manter o código; não registrada antes, para não gerar commit), o aluno pediu para comparar o seu PR com os PRs da prova dos colegas.
+- **Prompts enviados:** "analise os PR que fizeram para a prova do professor e analise se o meu segue no mesmo esquema e se eu esqueci de algo" / "sim, adicione a evidência de Git"
+- **Resumo da resposta da IA:**
+  - 13 PRs da prova analisados (somente leitura); todos com o workflow `waiting` (sem parecer do bot).
+  - O do aluno está correto em título, data, arquivo único, modelo, checklist 13/13 e link.
+  - Só 1 de 12 `entrega.md` tem evidência de Git. No do aluno, o item "6 commits + feature branch" era o único do checklist sem evidência.
+- **Decisão do aluno:** ACEITA.
+- **O que realmente foi implementado:**
+  - `evidencias/git-log.txt` com a saída real (43 commits; 0 fora do padrão; 6 merges `--no-ff`; branches remotas; `git log --graph`), capturada antes do commit que adiciona o arquivo.
+  - Uma linha nova na tabela de evidências do README.
+  - Bloco "Git" no `entrega.md` (rascunho e fork), com 24 linhas copiadas literalmente.
+- **Erro cometido pela IA:** ver nº 26.
+- **Arquivos alterados:** `evidencias/git-log.txt`, `README.md`, `HISTORICO_IA.md`, `docs/HISTORICO_IA.md` (projeto); `entregas/provaPrimeiroBi/6322006/entrega.md` (fork) e o rascunho.
+- **Como foi validado:** cada linha do bloco conferida com `grep -qxF` no arquivo (24/24); `grep` de termos sensíveis = 0.
+- **Resultado:** OK. PR ainda não aberto.
+
 ---
 
 ## Erros cometidos pela IA (consolidado)
@@ -1053,6 +1071,7 @@
 | 23 | 45 | Conferência `git diff upstream/main...HEAD` rodada sem `git fetch upstream` no clone novo; falhou e interrompeu a cadeia antes do push | Erro "unknown revision" | `git fetch upstream`, conferência refeita (só o `entrega.md`) e push depois |
 | 24 | 47 | `perl` com o texto `A **Aula 07**` interpolado na regex sem `\Q…\E`; o `**` virou quantificador e o comando abortou | Erro "Nested quantifiers"; arquivo conferido com `cmp` = intacto | Refeito com `\Q…\E` |
 | 25 | 47 | `perl -CSD` lia o arquivo como UTF-8, mas as strings do `-e` não; os 6 cortes com acento não casaram (só 7 de 13 aplicados) | Contagem de CRs (+14 em vez de +26) e linhas por questão | Os 6 cortes restantes reaplicados em modo bytes; palavras conferidas = idênticas |
+| 26 | 48 | Bloco de Git do `entrega.md` com um cabeçalho anotado à mão ("(trecho: primeira feature branch)"), contrariando "linhas copiadas sem edição" (mesmo tipo do erro nº 17) | Conferência linha a linha com `grep -qxF` | Linha trocada pela original; 24/24 literais |
 
 ## Sugestões rejeitadas (consolidado)
 
