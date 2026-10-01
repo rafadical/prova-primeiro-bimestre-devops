@@ -125,7 +125,7 @@ terraform init
 terraform apply -target=random_id.bucket_suffix
 B=$(terraform output -raw s3_bucket_name)
 aws s3api create-bucket --bucket "$B" --region us-east-1
-aws s3api put-bucket-tagging --bucket "$B" --tagging 'TagSet=[{Key=Project,Value=technova},{Key=ManagedBy,Value=Terraform},{Key=Owner,Value=6322006}]'
+aws s3api put-bucket-tagging --bucket "$B" --tagging 'TagSet=[{Key=Project,Value=technova},{Key=Environment,Value=dev},{Key=ManagedBy,Value=Terraform},{Key=Owner,Value=6322006},{Key=Purpose,Value="Terraform Remote State"}]'
 terraform apply                          # versionamento, encriptação, bloqueio público, DynamoDB
 
 # 2) Infraestrutura principal
@@ -154,9 +154,26 @@ cd backend && terraform destroy          # configs do bucket + DynamoDB
 | Arquivo | Conteúdo |
 |---|---|
 | `evidencias/docker-build.txt` | `docker build` da imagem (exit code 0) |
-| `evidencias/docker-run.txt` | container rodando como usuário `node`, `/health` e CRUD |
-| `evidencias/compose-ps.txt` | `docker compose ps` (healthy), volume e rede, dados após `down`/`up` |
+| `evidencias/docker-run.txt` | container avulso (host 3001 → 3000, banco temporário) rodando como usuário `node`, `/health` e CRUD |
+| `evidencias/compose-ps.txt` | `docker compose ps` (healthy), volume e rede, CRUD local, dados no PostgreSQL e o mesmo registro após `docker compose down` + `up` |
+| `evidencias/terraform-validate.txt` | saída real de `terraform fmt -check` e `terraform validate` (infra e backend) |
 | `evidencias/terraform-plan.txt` | `terraform plan` (15 recursos, 0 IAM) |
 | `evidencias/aws-api-rds.txt` | API na EC2 gravando no RDS, `psql` no RDS, configuração do RDS/SG/EC2, state no S3 |
 | `evidencias/terraform-destroy.txt` | destroy da infra e do backend; verificação de que nada restou |
-| `evidencias/Captura de tela *.png` | prints do terminal e do navegador durante a execução na AWS |
+| `evidencias/print-01-sts-identidade-e-terraform-output.png` | identidade do Learner Lab (`voclabs`) e `terraform output` |
+| `evidencias/print-02-api-ec2-navegador.png` | `/reservas` da EC2 no navegador |
+| `evidencias/print-03-api-curl-psql-rds-e-config-rds.png` | `curl` na API, `psql` no RDS (IP 10.0.3.250) e configuração do RDS |
+| `evidencias/print-04-sg-rds-e-remote-state-s3-dynamodb.png` | SG do RDS (origem = SG da EC2), state no S3, versionamento, AES256 e DynamoDB |
+
+## Limitações conhecidas
+
+Pontos identificados na auditoria final que **não foram alterados**, porque o código precisa continuar idêntico ao que foi aplicado e evidenciado na AWS (corrigi-los exigiria um novo `apply` e novas evidências):
+
+- **SSH (22) aberto para `0.0.0.0/0`** — padrão dos laboratórios; em produção, restringir com a variável `ssh_allowed_cidrs` (ex.: `["SEU_IP/32"]`).
+- **Senha do RDS no user data** — o `user_data.sh` grava as variáveis de conexão em `/opt/reservas/api.env` (`chmod 600`), mas o user data fica visível nos metadados da instância. Em produção: AWS Secrets Manager/SSM Parameter Store.
+- **SSL sem validação de certificado** — a API conecta ao RDS com SSL (`DB_SSL=true`) e `rejectUnauthorized: false`; em produção, validar com o bundle de CA da AWS.
+- **EC2 constrói a imagem a partir da branch `main`** no momento do boot (sem versão fixa); em produção, usar uma imagem publicada em registry com tag.
+- **Bucket do state fora do Terraform** (SCP do Learner Lab): criação via CLI documentada mas não executada; `providers.tf` precisa ser ajustado com o nome do bucket.
+- **`dynamodb_table` deprecado** no backend S3 do Terraform 1.16 (aviso no `init`/`plan`); mantido porque a prova exige DynamoDB para o locking.
+- **`node:20-alpine`** segue o padrão das aulas; o Node.js 20 já está fora do período de suporte.
+- **`.terraform.lock.hcl` não versionado**, seguindo o `.gitignore` das aulas.
