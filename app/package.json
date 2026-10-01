@@ -1,0 +1,13 @@
+{
+  "name": "api-reservas",
+  "version": "1.0.0",
+  "description": "API de Reservas da TechNova - Prova do 1º Bimestre de DevOps",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "express": "4.22.3",
+    "pg": "8.23.1"
+  }
+}

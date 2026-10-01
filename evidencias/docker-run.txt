@@ -1,0 +1,37 @@
+# Evidência de execução do container — API de Reservas
+# Data: 2026-09-30 23:08:53 -0300
+# Imagem: api-reservas:1.0 | Banco: postgres:15-alpine temporário na rede rede-teste-etapa4
+# Mapeamento: host 3001 -> container 3000 (porta 3000 do host ocupada por outro projeto)
+
+## docker ps
+NAMES                IMAGE                STATUS          PORTS
+api-reservas-teste   api-reservas:1.0     Up 4 seconds    0.0.0.0:3001->3000/tcp, [::]:3001->3000/tcp
+pg-teste-etapa4      postgres:15-alpine   Up 10 seconds   5432/tcp
+
+## Usuário do processo dentro do container (deve ser não-root)
+$ docker exec api-reservas-teste whoami
+node
+$ docker exec api-reservas-teste id
+uid=1000(node) gid=1000(node) groups=1000(node)
+
+## docker logs api-reservas-teste
+API de Reservas rodando na porta 3000
+
+## curl http://localhost:3001/health
+{"status":"healthy","banco":"conectado","uptime":6.827179598}  [HTTP 200]
+
+## curl -X POST http://localhost:3001/reservas
+{"id":1,"cliente":"Teste Docker","data":"2026-10-10","status":"pendente"}  [HTTP 201]
+
+## curl http://localhost:3001/reservas
+[{"id":1,"cliente":"Teste Docker","data":"2026-10-10","status":"pendente"}]  [HTTP 200]
+
+## Conteúdo de /app na imagem (sem .env, README, Dockerfile)
+$ docker exec api-reservas-teste ls -la /app
+total 56
+drwxr-xr-x    1 root     root          4096 Oct  1 02:07 .
+drwxr-xr-x    1 root     root          4096 Oct  1 02:08 ..
+drwxr-xr-x   84 root     root          4096 Oct  1 02:07 node_modules
+-rwxr-xr-x    1 root     root         34888 Oct  1 02:01 package-lock.json
+-rwxr-xr-x    1 root     root           283 Oct  1 02:01 package.json
+drwxr-xr-x    3 root     root          4096 Oct  1 02:02 src

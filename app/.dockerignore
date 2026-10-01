@@ -1,0 +1,18 @@
+# Dependências (instaladas dentro do container pelo npm ci)
+node_modules/
+npm-debug.log
+
+# Git
+.git/
+.gitignore
+
+# Variáveis de ambiente locais (segredos)
+.env
+
+# Logs
+*.log
+
+# Documentação e arquivos Docker (não são necessários na imagem)
+README.md
+Dockerfile
+.dockerignore

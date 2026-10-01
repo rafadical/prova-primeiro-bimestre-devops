@@ -1,0 +1,73 @@
+# Evidência de build — API de Reservas
+# Data: 2026-09-30 23:07:05 -0300
+# Comando: docker build --no-cache --progress=plain -t api-reservas:1.0 ./app
+
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.04kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:20-alpine
+#2 DONE 0.3s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 324B done
+#3 DONE 0.0s
+
+#4 [internal] load build context
+#4 transferring context: 229B done
+#4 DONE 0.0s
+
+#5 [deps 1/4] FROM docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293
+#5 resolve docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293 0.0s done
+#5 DONE 0.0s
+
+#6 [deps 2/4] WORKDIR /app
+#6 CACHED
+
+#7 [deps 3/4] COPY package*.json ./
+#7 DONE 0.1s
+
+#8 [deps 4/4] RUN npm ci --omit=dev
+#8 2.413 
+#8 2.413 added 82 packages, and audited 83 packages in 2s
+#8 2.413 
+#8 2.414 16 packages are looking for funding
+#8 2.414   run `npm fund` for details
+#8 2.415 
+#8 2.415 found 0 vulnerabilities
+#8 2.417 npm notice
+#8 2.417 npm notice New major version of npm available! 10.8.2 -> 12.2.0
+#8 2.417 npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+#8 2.417 npm notice To update run: npm install -g npm@12.2.0
+#8 2.417 npm notice
+#8 DONE 2.5s
+
+#9 [stage-1 3/5] COPY --from=deps /app/node_modules ./node_modules
+#9 DONE 0.4s
+
+#10 [stage-1 4/5] COPY package*.json ./
+#10 DONE 0.1s
+
+#11 [stage-1 5/5] COPY src ./src
+#11 DONE 0.1s
+
+#12 exporting to image
+#12 exporting layers
+#12 exporting layers 0.3s done
+#12 exporting manifest sha256:c13730e47e6b5d6c94a14c7c9f2f4fc6404678b229296e18d79a5768bbe87648 0.0s done
+#12 exporting config sha256:ba4bd5ea2ec805f52dc0b5fd31ed6a090b074eb9afc92e34ed7077a2c8b2eca2 0.0s done
+#12 exporting attestation manifest sha256:58ea37051eaaf085d09b34f7db93f1a80c752ef4281f8a90544e9c9a59d0e56c 0.0s done
+#12 exporting manifest list sha256:6c8773053d292d446e3e0bd9434317d71fe2fe968082ed919c57d1200c5731eb 0.0s done
+#12 naming to docker.io/library/api-reservas:1.0
+#12 naming to docker.io/library/api-reservas:1.0 done
+#12 unpacking to docker.io/library/api-reservas:1.0
+#12 unpacking to docker.io/library/api-reservas:1.0 0.5s done
+#12 DONE 0.9s
+
+# Exit code do docker build: 0
+
+# docker images api-reservas
+IMAGE              ID             DISK USAGE   CONTENT SIZE   EXTRA
+api-reservas:1.0   6c8773053d29        200MB         49.2MB        
