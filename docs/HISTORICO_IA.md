@@ -995,7 +995,32 @@
   - Comando do PR preparado, **não executado**.
 - **Arquivos alterados:** `entregas/provaPrimeiroBi/6322006/entrega.md` (no fork); `HISTORICO_IA.md` e `docs/HISTORICO_IA.md` (sincronização final antes do PR).
 - **Como foi validado:** `cmp` com o rascunho; `git diff --name-only upstream/main...HEAD` = só o `entrega.md`; compare da API (ahead 1, behind 0, 1 arquivo); `gh pr list` sem PR aberto.
-- **Resultado:** OK. Esta é a última alteração no repositório do projeto antes do PR; a interação da abertura do PR ficará só no histórico local.
+- **Resultado:** OK. Na época, seria a última alteração antes do PR; a Interação 47 precisou de mais uma, ainda antes do PR.
+
+## Interação 46 — Verificação final e nota estimada (sem alterações)
+- **Data:** 2026-10-01
+- **Contexto:** o aluno pediu mais uma verificação de tudo o que o professor pediu e uma nota criteriosa de 0 a 10.
+- **Prompt enviado:** "verifique mais uma vez se tudo que o professor pediu foi feito e de 0 a 10 qual nota meu PR teria sendo muito criterioso"
+- **Resumo da resposta da IA (somente leitura):**
+  - Enunciado e bot sem mudanças. Na `main` do GitHub: 21 de 21 caminhos exigidos, 0 arquivos proibidos, 40 commits em Conventional Commits, 5 feature branches, 0 `aws_iam`. Branch do fork igual ao rascunho, com 1 arquivo; nenhum PR aberto.
+  - Nota estimada pelos pesos do enunciado: **≈ 8,7** (faixa de 8,3 a 9,2). Descontos: SSH × "menor privilégio", reprodutibilidade do backend, senha no user data, autoria (IA executou quase tudo) e decisão do Docker tomada pela IA. **[INFERÊNCIA]** É uma estimativa, não a nota do professor.
+  - **Achado novo:** "mínimo 10 linhas por questão" (PROVA, linha 208). No arquivo-fonte, a Q1 tinha 6 linhas não vazias e a Q3, 9 (parágrafos longos). **[INFERÊNCIA]** Risco se as linhas forem contadas no markdown.
+- **Decisão do aluno:** dividir os parágrafos (Interação 47).
+- **O que realmente foi implementado:** nada.
+- **Arquivos alterados:** nenhum.
+- **Como foi validado:** `gh api` (repo, tree, commits, compare, contents), `awk` de linhas e palavras por questão.
+- **Resultado:** OK
+
+## Interação 47 — Relatório: Q1 e Q3 com pelo menos 10 linhas (só formatação)
+- **Data:** 2026-10-01 (dia da entrega)
+- **Contexto:** o PR será aberto hoje; o aluno pediu para corrigir a formatação para chegar a 10 linhas.
+- **Prompt enviado:** "O PR vai ser feito hoje daqui a pouco que é o dia de entrega, arrumo esse problema de formatação para chegar em 10 linhas"
+- **Resumo da resposta da IA:** dividir os parágrafos da Q1 e da Q3 nos limites de frase (13 cortes únicos, conferidos com `grep`), **sem mudar nenhuma palavra**.
+- **Decisão do aluno:** ACEITA (pedido do aluno).
+- **O que realmente foi implementado:** na branch `feature/relatorio-formatacao`, com merge `--no-ff` na `main`: Q1 passou de 6 para 13 parágrafos e Q3, de 9 para 13. Q2 (11) e Q4 (23) sem alteração.
+- **Arquivos alterados:** `relatorio.md`; `HISTORICO_IA.md` e `docs/HISTORICO_IA.md`.
+- **Como foi validado:** `diff` da sequência de palavras antes e depois = idênticas; `file` = UTF-8 com CRLF; contagem de linhas por questão com `awk`.
+- **Resultado:** OK. O `entrega.md` não muda (o checklist já marcava o relatório completo).
 
 ---
 
@@ -1026,6 +1051,8 @@
 | 21 | 43 | Ao aplicar o texto do SSH, a IA "corrigiu" a frase aprovada ("O laboratório da Aula 04 e o TA recomendam...") achando que só o TA dizia isso, sem conferir o laboratório; o commit `b7b9c46` saiu com essa versão | Conferência posterior: `aula-04/laboratorio-parte1.md:458` diz "Em produção, restringir ao seu IP!" | Texto original restaurado em novo commit antes do merge |
 | 22 | 43 | `git merge -F -` (mensagem pela entrada padrão) não é suportado pelo `git merge`; o merge falhou com "could not read file '-'" | Saída do comando e `git log` sem o merge | Merge refeito com `-m`; nenhum arquivo afetado |
 | 23 | 45 | Conferência `git diff upstream/main...HEAD` rodada sem `git fetch upstream` no clone novo; falhou e interrompeu a cadeia antes do push | Erro "unknown revision" | `git fetch upstream`, conferência refeita (só o `entrega.md`) e push depois |
+| 24 | 47 | `perl` com o texto `A **Aula 07**` interpolado na regex sem `\Q…\E`; o `**` virou quantificador e o comando abortou | Erro "Nested quantifiers"; arquivo conferido com `cmp` = intacto | Refeito com `\Q…\E` |
+| 25 | 47 | `perl -CSD` lia o arquivo como UTF-8, mas as strings do `-e` não; os 6 cortes com acento não casaram (só 7 de 13 aplicados) | Contagem de CRs (+14 em vez de +26) e linhas por questão | Os 6 cortes restantes reaplicados em modo bytes; palavras conferidas = idênticas |
 
 ## Sugestões rejeitadas (consolidado)
 
