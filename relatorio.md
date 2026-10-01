@@ -39,7 +39,7 @@ O que precisou ser corrigido, e que eu decidi registrar com honestidade:
 - Várias verificações usaram `grep`, `tail` ou `$?` de forma errada e geraram falsos positivos.
 - Em um comando, a IA esqueceu de carregar as credenciais do Lab.
 
-Ao todo foram 18 erros ou fragilidades registrados no histórico, nenhum com impacto na infraestrutura entregue. Seis deles só apareceram em uma auditoria final que pedi à IA, agindo "como o professor": uma afirmação incorreta neste relatório, uma linha de evidência digitada em vez de capturada, um trecho de evidência resumido sem aviso, a persistência do Compose apenas afirmada, trechos editados no rascunho do `entrega.md` e uma captura sem o código HTTP do POST. Todos foram corrigidos antes da entrega.
+Todos os erros e fragilidades da IA estão registrados na tabela consolidada do histórico (`docs/HISTORICO_IA.md`), e nenhum teve impacto na infraestrutura entregue. Seis deles só apareceram em uma auditoria final que pedi à IA, agindo "como o professor": uma afirmação incorreta neste relatório, uma linha de evidência digitada em vez de capturada, um trecho de evidência resumido sem aviso, a persistência do Compose apenas afirmada, trechos editados no rascunho do `entrega.md` e uma captura sem o código HTTP do POST. Todos foram corrigidos antes da entrega.
 
 Também tomei decisões que a IA não podia tomar sozinha: as regras de validação que a prova não define (campos obrigatórios, formato da data e uma lista fixa de status), usar SSE-S3 em vez de KMS no bucket e como contornar a restrição do Learner Lab no S3 (tirar o bucket do state em vez de testar outra versão do provider). Já a forma de rodar a API na EC2 (Docker em vez de Node direto) foi uma recomendação da IA que **ela aplicou sem que eu tivesse escolhido explicitamente** — eu havia pedido para seguir até a etapa da AWS e não respondi a essa pergunta. Registrei isso como uma falha do processo: uma decisão de arquitetura deveria ter esperado a minha resposta. Comparando com fazer manualmente, a IA economizou muito tempo em código repetitivo e em detalhes de sintaxe do Terraform. Atrapalhou quando "afirmava" resultados a partir de verificações mal feitas. Por isso exigi as pré-validações e conferi cada resultado antes de aceitar.
 
@@ -82,7 +82,7 @@ Para validar que a infraestrutura estava correta e segura, não confiei só no "
 - No final, confirmei que nenhum recurso tinha sobrado na AWS.
 
 Mesmo com essas validações, a auditoria final mostrou pontos que continuam frágeis e que eu prefiro declarar a esconder:
-- A porta 22 ficou aberta para `0.0.0.0/0` (padrão dos labs, mas não é menor privilégio de verdade).
+- A porta 22 ficou aberta para `0.0.0.0/0`. É o que o professor exigiu no TF da Aula 04 e usou no código da Aula 05, mas o TA da mesma aula recomenda liberar o SSH "apenas do seu IP". Em termos de menor privilégio, o ideal seria restringir ao meu IP com a variável `ssh_allowed_cidrs`, que já existe no código.
 - A senha do RDS chega à EC2 pelo user data.
 - A conexão SSL com o RDS não valida o certificado.
 - A EC2 constrói a imagem a partir da `main` sem versão fixa.
