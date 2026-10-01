@@ -1,0 +1,83 @@
+# Evidência — histórico Git (Conventional Commits + feature branches + merge --no-ff)
+# Capturado em: 2026-10-01 19:17:55 -0300 — estado da main antes do commit que adiciona este arquivo
+
+## $ git rev-list --count main
+43
+
+## $ git log main --format=%s | grep -vcE "^(feat|fix|docs|chore|refactor|test|style|ci|build|perf)(\(.+\))?: "   (commits fora do padrão)
+0
+
+## $ git log main --merges --oneline
+21cad05 chore: merge da feature/relatorio-formatacao na main
+0083dc9 chore: merge da feature/historico-final na main
+1c6ac78 chore: merge da feature/ajustes-auditoria na main
+6cccba5 chore: merge da feature/documentacao na main
+502a457 chore: merge da feature/infra-terraform na main
+8520941 chore: merge da feature/api-reservas na main
+
+## $ git branch -r
+  origin/HEAD -> origin/main
+  origin/feature/ajustes-auditoria
+  origin/feature/api-reservas
+  origin/feature/documentacao
+  origin/feature/historico-final
+  origin/feature/infra-terraform
+  origin/feature/relatorio-formatacao
+  origin/main
+
+## $ git log main --graph --oneline
+*   21cad05 chore: merge da feature/relatorio-formatacao na main
+|\  
+| * bff0c92 docs: registra verificação final e formatação do relatório no histórico de IA
+| * 2ce9715 docs: divide parágrafos das questões 1 e 3 do relatório
+|/  
+*   0083dc9 chore: merge da feature/historico-final na main
+|\  
+| * 68e6cf7 docs: registra preparação do PR no histórico de IA
+|/  
+*   1c6ac78 chore: merge da feature/ajustes-auditoria na main
+|\  
+| * 4ed0d81 docs: registra erro do merge no histórico de IA
+| * b782ce1 docs: completa histórico de IA com a segunda auditoria e as correções
+| * ff815c1 docs: restaura texto aprovado da justificativa do SSH
+| * b7b9c46 docs: justifica SSH com material das aulas e remove contagem fixa de erros
+|/  
+* 7475997 docs: registra decisão de finalizar sem nova sessão do Lab
+* f292ae9 docs: sincroniza histórico de IA com a etapa final
+*   6cccba5 chore: merge da feature/documentacao na main
+|\  
+| * 318484b docs: adiciona REGRAS.md e HISTORICO_IA.md usados como apoio no uso da IA
+| * 79d5b12 docs: corrige relatório sobre decisões e transparência do uso de IA
+| * d60755a docs: atualiza evidências no README e adiciona limitações conhecidas
+| * 5c48acf docs: identifica resumo escrito na evidência do destroy do bucket
+| * 79399ac docs: adiciona saída real do terraform validate e corrige anotação do plan
+| * b409019 docs: reforça evidência do compose com CRUD local e persistência após down/up
+| * 6d72082 docs: renomeia prints das evidências com nomes descritivos
+| * 3790230 docs: adiciona relatório do processo com IA (4 questões)
+| * 2487840 docs: completa README com rotas, ambiente local, arquitetura AWS e evidências
+|/  
+*   502a457 chore: merge da feature/infra-terraform na main
+|\  
+| * 3be62dc docs: atualiza comandos testados de remoção do bucket do state
+| * 7b4d043 docs: adiciona evidência do terraform destroy da infra e do backend
+| * 7d3acd2 docs: adiciona prints das evidências na AWS (API, RDS, SG e remote state)
+| * d60adeb docs: adiciona evidência da API na EC2 gravando no RDS
+| * 76091fe docs: adiciona evidência do terraform plan da infraestrutura
+| * 49a4bb5 chore: configura bucket real do backend s3 no projeto principal
+| * 4c34104 fix: contorna SCP do Learner Lab no bucket do remote state
+| * dcf3222 feat: compõe infraestrutura AWS com módulos e backend S3
+| * 935e317 feat: adiciona módulos Terraform vpc, security-group, ec2 e rds
+| * 63fbc9e feat: adiciona backend do remote state com S3 e DynamoDB
+|/  
+*   8520941 chore: merge da feature/api-reservas na main
+|\  
+| * 7ecd832 docs: adiciona evidência do docker compose ps
+| * b678a7b feat: adiciona Docker Compose com API e PostgreSQL
+| * cf6e9cb docs: adiciona evidências de build e execução do container
+| * 93a505f feat: adiciona Dockerfile multi-stage com usuário não-root
+| * eb7002a feat: implementa CRUD de reservas e health check
+| * 24f0dcd feat: adiciona conexão com PostgreSQL e criação da tabela reservas
+| * 396e93a chore: inicializa projeto Node da API com express e pg
+|/  
+* c8d5b07 docs: adiciona README com nome, RA e descrição do projeto
+* ec42ede chore: adiciona .gitignore para Node, Terraform e segredos

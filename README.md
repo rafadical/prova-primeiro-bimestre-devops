@@ -153,6 +153,7 @@ cd backend && terraform destroy          # configs do bucket + DynamoDB
 
 | Arquivo | Conteúdo |
 |---|---|
+| `evidencias/git-log.txt` | histórico Git: total de commits, 0 fora do Conventional Commits, merges `--no-ff` das feature branches e `git log --graph` |
 | `evidencias/docker-build.txt` | `docker build` da imagem (exit code 0) |
 | `evidencias/docker-run.txt` | container avulso (host 3001 → 3000, banco temporário) rodando como usuário `node`, `/health` e CRUD |
 | `evidencias/compose-ps.txt` | `docker compose ps` (healthy), volume e rede, CRUD local, dados no PostgreSQL e o mesmo registro após `docker compose down` + `up` |
